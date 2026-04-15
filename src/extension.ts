@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 
-type ShowInTarget = 'all' | 'panel' | 'statusbar';
+type ShowInTarget = 'all' | 'sidebar' | 'statusbar';
 
 interface SubCommand {
   label: string;
@@ -70,12 +70,12 @@ class QuickCommandViewProvider implements vscode.WebviewViewProvider {
 
     buttons.forEach((btn) => {
       if (btn.group) {
-        if (!shouldShowIn('panel', btn)) {
+        if (!shouldShowIn('sidebar', btn)) {
           return;
         }
         flushSingles();
         const subBtns = btn.group
-          .filter((sub) => shouldShowIn('panel', sub))
+          .filter((sub) => shouldShowIn('sidebar', sub))
           .map((sub) => {
             const cmdJson = JSON.stringify(sub.command);
             const tipStr = Array.isArray(sub.command) ? sub.command.join(' && ') : sub.command;
@@ -94,7 +94,7 @@ class QuickCommandViewProvider implements vscode.WebviewViewProvider {
             </div>`);
         }
       } else {
-        if (!shouldShowIn('panel', btn)) {
+        if (!shouldShowIn('sidebar', btn)) {
           return;
         }
         const cmdJson = JSON.stringify(btn.command || '');
@@ -332,19 +332,20 @@ function rebuildAll() {
   const { userButtons, workspaceButtons } = getAllButtons();
   const allButtons = [...userButtons, ...workspaceButtons];
 
-  let statusIndex = 0;
+  const MAX_STATUSBAR_ITEMS = 10;
+  let topCount = 0;
+  let cmdIndex = 0;
 
   allButtons.forEach((btn) => {
-    if (!shouldShowIn('statusbar', btn)) {
-      return;
-    }
+    if (topCount >= MAX_STATUSBAR_ITEMS) { return; }
+    if (!shouldShowIn('statusbar', btn)) { return; }
 
     if (btn.group) {
-      const commandId = `quickCommand.run.${statusIndex}`;
+      const commandId = `quickCommand.run.${cmdIndex}`;
       const cmdDisp = vscode.commands.registerCommand(commandId, () => showGroupPick(btn.group!));
       dynamicDisposables.push(cmdDisp);
 
-      const item = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 10000 - statusIndex);
+      const item = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 10000 - cmdIndex);
       const iconStr = btn.icon ? `$(${btn.icon}) ` : '';
       item.text = `${iconStr}${btn.label} $(chevron-down)`;
       item.command = commandId;
@@ -355,41 +356,44 @@ function rebuildAll() {
       item.tooltip = new vscode.MarkdownString(lines.join('\n'), true);
       item.show();
       statusBarItems.push(item);
-      statusIndex++;
+      topCount++;
+      cmdIndex++;
 
+      // Sub-commands pinned to statusbar don't count toward the limit
       btn.group.forEach((sub) => {
-        if (!shouldShowIn('statusbar', sub)) {
-          return;
-        }
-        const subCommandId = `quickCommand.run.${statusIndex}`;
+        if (!shouldShowIn('statusbar', sub)) { return; }
+        const subCommandId = `quickCommand.run.${cmdIndex}`;
         const subDisp = vscode.commands.registerCommand(subCommandId, () =>
           sendToTerminal(sub.command, sub.execute ?? false),
         );
         dynamicDisposables.push(subDisp);
 
-        const subItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 10000 - statusIndex);
-        subItem.text = sub.label;
+        const subItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 10000 - cmdIndex);
+        const subExecDot = sub.execute ? ' $(circle-filled)' : '';
+        subItem.text = `${sub.label}${subExecDot}`;
         subItem.command = subCommandId;
         const subCmdStr = Array.isArray(sub.command) ? sub.command.join(' && ') : sub.command;
-        subItem.tooltip = subCmdStr;
+        subItem.tooltip = subCmdStr + (sub.execute ? ' (auto-execute)' : ' (type only)');
         subItem.show();
         statusBarItems.push(subItem);
-        statusIndex++;
+        cmdIndex++;
       });
     } else {
-      const commandId = `quickCommand.run.${statusIndex}`;
+      const commandId = `quickCommand.run.${cmdIndex}`;
       const cmdDisp = vscode.commands.registerCommand(commandId, () => executeButton(btn));
       dynamicDisposables.push(cmdDisp);
 
-      const item = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 10000 - statusIndex);
+      const item = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 10000 - cmdIndex);
       const iconStr = btn.icon ? `$(${btn.icon}) ` : '';
-      item.text = `${iconStr}${btn.label}`;
+      const execDot = btn.execute ? ' $(circle-filled)' : '';
+      item.text = `${iconStr}${btn.label}${execDot}`;
       item.command = commandId;
       const cmdStr = Array.isArray(btn.command) ? btn.command.join(' && ') : btn.command || '';
-      item.tooltip = cmdStr;
+      item.tooltip = cmdStr + (btn.execute ? ' (auto-execute)' : ' (type only)');
       item.show();
       statusBarItems.push(item);
-      statusIndex++;
+      topCount++;
+      cmdIndex++;
     }
   });
 
@@ -408,8 +412,8 @@ function sendToTerminal(command: string | string[], execute = false) {
   let terminal = vscode.window.activeTerminal;
   if (!terminal) {
     terminal = vscode.window.createTerminal();
-    terminal.show();
   }
+  terminal.show(false);
   const lines = Array.isArray(command) ? command : [command];
   lines.forEach((line, i) => {
     const addNewLine = i < lines.length - 1 ? true : execute;

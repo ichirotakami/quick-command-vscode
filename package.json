@@ -1,6 +1,7 @@
 {
   "name": "quick-command",
   "displayName": "Quick Command",
+  "publisher": "obroom",
   "description": "Provides quick command buttons for the terminal. Click to send commands instantly.",
   "version": "0.0.1",
   "repository": {
@@ -126,9 +127,9 @@
               },
               "showIn": {
                 "type": "array",
-                "items": { "type": "string", "enum": ["all", "panel", "statusbar"] },
+                "items": { "type": "string", "enum": ["all", "sidebar", "statusbar"] },
                 "default": [],
-                "description": "Where to show this button. Options: \"all\", \"panel\", \"statusbar\". Default: [] (show everywhere)"
+                "description": "Where to show this button. Options: \"all\", \"sidebar\", \"statusbar\". Default: [] (show everywhere)"
               },
               "group": {
                 "type": "array",
@@ -158,9 +159,9 @@
                     },
                     "showIn": {
                       "type": "array",
-                      "items": { "type": "string", "enum": ["all", "panel", "statusbar"] },
+                      "items": { "type": "string", "enum": ["all", "sidebar", "statusbar"] },
                       "default": [],
-                      "description": "Where to show this sub-command. Options: \"all\", \"panel\", \"statusbar\". Default: [] (show everywhere)"
+                      "description": "Where to show this sub-command. Options: \"all\", \"sidebar\", \"statusbar\". Default: [] (show everywhere)"
                     }
                   }
                 }
@@ -205,9 +206,9 @@
               },
               "showIn": {
                 "type": "array",
-                "items": { "type": "string", "enum": ["all", "panel", "statusbar"] },
+                "items": { "type": "string", "enum": ["all", "sidebar", "statusbar"] },
                 "default": [],
-                "description": "Where to show this button. Options: \"all\", \"panel\", \"statusbar\". Default: [] (show everywhere)"
+                "description": "Where to show this button. Options: \"all\", \"sidebar\", \"statusbar\". Default: [] (show everywhere)"
               },
               "group": {
                 "type": "array",
@@ -237,9 +238,9 @@
                     },
                     "showIn": {
                       "type": "array",
-                      "items": { "type": "string", "enum": ["all", "panel", "statusbar"] },
+                      "items": { "type": "string", "enum": ["all", "sidebar", "statusbar"] },
                       "default": [],
-                      "description": "Where to show this sub-command. Options: \"all\", \"panel\", \"statusbar\". Default: [] (show everywhere)"
+                      "description": "Where to show this sub-command. Options: \"all\", \"sidebar\", \"statusbar\". Default: [] (show everywhere)"
                     }
                   }
                 }
