@@ -80,7 +80,7 @@ class QuickCommandViewProvider implements vscode.WebviewViewProvider {
             const cmdJson = JSON.stringify(sub.command);
             const tipStr = Array.isArray(sub.command) ? sub.command.join(' && ') : sub.command;
             const execFlag = sub.execute ? 'true' : 'false';
-            return `<button class="btn btn-sub ${sub.execute ? 'btn-exec' : ''}" data-cmd='${escAttr(cmdJson)}' data-execute="${execFlag}" title="${escHtml(tipStr)}">${escHtml(sub.label)}${sub.execute ? '<span class="exec-dot"></span>' : ''}</button>`;
+            return `<button class="btn btn-sub ${sub.execute ? 'btn-exec' : ''}" data-cmd='${escAttr(cmdJson)}' data-execute="${execFlag}" title="${escHtml(tipStr)}">${escHtml(sub.label)}</button>`;
           })
           .join('');
         if (subBtns) {
@@ -103,7 +103,7 @@ class QuickCommandViewProvider implements vscode.WebviewViewProvider {
         singleBtns.push(`
           <button class="btn ${btn.execute ? 'btn-exec' : ''}" data-cmd='${escAttr(cmdJson)}' data-execute="${execFlag}" title="${escHtml(tipStr)}">
             <span class="codicon codicon-${escHtml(btn.icon || 'terminal')}"></span>
-            ${escHtml(btn.label)}${btn.execute ? '<span class="exec-dot"></span>' : ''}
+            ${escHtml(btn.label)}
           </button>`);
       }
     });
@@ -197,14 +197,8 @@ class QuickCommandViewProvider implements vscode.WebviewViewProvider {
     padding: 3px 8px;
     font-size: 11px;
   }
-  .exec-dot {
-    display: inline-block;
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-    background: var(--vscode-terminal-ansiGreen, #89d185);
-    margin-left: 2px;
-    vertical-align: middle;
+  .btn-exec {
+    color: var(--vscode-terminal-ansiGreen, #89d185);
   }
   .codicon {
     font-size: 14px;
@@ -369,11 +363,11 @@ function rebuildAll() {
         dynamicDisposables.push(subDisp);
 
         const subItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 10000 - cmdIndex);
-        const subExecDot = sub.execute ? ' $(circle-filled)' : '';
-        subItem.text = `${sub.label}${subExecDot}`;
+        subItem.text = sub.label;
+        if (sub.execute) { subItem.color = new vscode.ThemeColor('terminal.ansiGreen'); }
         subItem.command = subCommandId;
         const subCmdStr = Array.isArray(sub.command) ? sub.command.join(' && ') : sub.command;
-        subItem.tooltip = subCmdStr + (sub.execute ? ' (auto-execute)' : ' (type only)');
+        subItem.tooltip = subCmdStr;
         subItem.show();
         statusBarItems.push(subItem);
         cmdIndex++;
@@ -385,11 +379,11 @@ function rebuildAll() {
 
       const item = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 10000 - cmdIndex);
       const iconStr = btn.icon ? `$(${btn.icon}) ` : '';
-      const execDot = btn.execute ? ' $(circle-filled)' : '';
-      item.text = `${iconStr}${btn.label}${execDot}`;
+      item.text = `${iconStr}${btn.label}`;
+      if (btn.execute) { item.color = new vscode.ThemeColor('terminal.ansiGreen'); }
       item.command = commandId;
       const cmdStr = Array.isArray(btn.command) ? btn.command.join(' && ') : btn.command || '';
-      item.tooltip = cmdStr + (btn.execute ? ' (auto-execute)' : ' (type only)');
+      item.tooltip = cmdStr;
       item.show();
       statusBarItems.push(item);
       topCount++;
