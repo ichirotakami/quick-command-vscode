@@ -1,0 +1,292 @@
+{
+  "name": "quick-command",
+  "displayName": "Quick Command",
+  "description": "Provides quick command buttons for the terminal. Click to send commands instantly.",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kookob/quick-command.git"
+  },
+  "icon": "icon.png",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "quickCommandPanel",
+          "title": "Quick Command",
+          "icon": "$(zap)"
+        }
+      ]
+    },
+    "views": {
+      "quickCommandPanel": [
+        {
+          "icon": "$(zap)",
+          "type": "webview",
+          "id": "quickCommand.buttonsView",
+          "name": "Commands"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Quick Command",
+      "properties": {
+        "quickCommand.buttons": {
+          "type": "array",
+          "scope": "application",
+          "default": [
+            {
+              "label": "Dev",
+              "icon": "play",
+              "command": "npm run dev",
+              "execute": false
+            },
+            {
+              "label": "Build",
+              "icon": "package",
+              "command": "npm run build",
+              "execute": false
+            },
+            {
+              "label": "Test",
+              "icon": "beaker",
+              "command": "npm test",
+              "execute": false
+            },
+            {
+              "label": "Git",
+              "icon": "git-merge",
+              "group": [
+                {
+                  "label": "Pull",
+                  "command": "git pull",
+                  "execute": false
+                },
+                {
+                  "label": "Push",
+                  "command": "git push",
+                  "execute": false
+                },
+                {
+                  "label": "Status",
+                  "command": "git status"
+                }
+              ]
+            },
+            {
+              "label": "Git Info",
+              "icon": "info",
+              "command": [
+                "git status",
+                "git log --oneline -5"
+              ],
+              "execute": true
+            }
+          ],
+          "description": "Global quick commands (user-level, shared across all projects)",
+          "items": {
+            "type": "object",
+            "properties": {
+              "label": {
+                "type": "string",
+                "description": "Button display text"
+              },
+              "icon": {
+                "type": "string",
+                "description": "Codicon icon name"
+              },
+              "command": {
+                "oneOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                ],
+                "description": "Command to send to terminal. Supports string or string array (multi-line)"
+              },
+              "execute": {
+                "type": "boolean",
+                "default": false,
+                "description": "Auto-press Enter after sending. Default: false (type only, no execute)"
+              },
+              "showIn": {
+                "type": "array",
+                "items": { "type": "string", "enum": ["all", "panel", "statusbar"] },
+                "default": [],
+                "description": "Where to show this button. Options: \"all\", \"panel\", \"statusbar\". Default: [] (show everywhere)"
+              },
+              "group": {
+                "type": "array",
+                "description": "Sub-command group",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "label": {
+                      "type": "string"
+                    },
+                    "command": {
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      ]
+                    },
+                    "execute": {
+                      "type": "boolean",
+                      "default": false
+                    },
+                    "showIn": {
+                      "type": "array",
+                      "items": { "type": "string", "enum": ["all", "panel", "statusbar"] },
+                      "default": [],
+                      "description": "Where to show this sub-command. Options: \"all\", \"panel\", \"statusbar\". Default: [] (show everywhere)"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "quickCommand.workspaceButtons": {
+          "type": "array",
+          "scope": "resource",
+          "default": [],
+          "description": "Workspace quick commands (project-level, current project only)",
+          "items": {
+            "type": "object",
+            "properties": {
+              "label": {
+                "type": "string",
+                "description": "Button display text"
+              },
+              "icon": {
+                "type": "string",
+                "description": "Codicon icon name"
+              },
+              "command": {
+                "oneOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                ],
+                "description": "Command to send to terminal. Supports string or string array (multi-line)"
+              },
+              "execute": {
+                "type": "boolean",
+                "default": false,
+                "description": "Auto-press Enter after sending. Default: false (type only, no execute)"
+              },
+              "showIn": {
+                "type": "array",
+                "items": { "type": "string", "enum": ["all", "panel", "statusbar"] },
+                "default": [],
+                "description": "Where to show this button. Options: \"all\", \"panel\", \"statusbar\". Default: [] (show everywhere)"
+              },
+              "group": {
+                "type": "array",
+                "description": "Sub-command group",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "label": {
+                      "type": "string"
+                    },
+                    "command": {
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      ]
+                    },
+                    "execute": {
+                      "type": "boolean",
+                      "default": false
+                    },
+                    "showIn": {
+                      "type": "array",
+                      "items": { "type": "string", "enum": ["all", "panel", "statusbar"] },
+                      "default": [],
+                      "description": "Where to show this sub-command. Options: \"all\", \"panel\", \"statusbar\". Default: [] (show everywhere)"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "quickCommand.refreshButtons",
+        "title": "Quick Command: Refresh Buttons",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "quickCommand.openSettings",
+        "title": "Quick Command: Edit Settings",
+        "icon": "$(gear)"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "quickCommand.refreshButtons",
+          "when": "view == quickCommand.buttonsView",
+          "group": "navigation@1"
+        },
+        {
+          "command": "quickCommand.openSettings",
+          "when": "view == quickCommand.buttonsView",
+          "group": "navigation@2"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "build": "esbuild src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node",
+    "watch": "npm run build -- --watch",
+    "package": "npm run build -- --minify"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.85.0",
+    "esbuild": "^0.20.0",
+    "typescript": "^5.3.0"
+  },
+  "dependencies": {
+    "@vscode/codicons": "^0.0.45"
+  }
+}

@@ -1,0 +1,9 @@
+.vscode/**
+node_modules/**
+!node_modules/@vscode/codicons/dist/**
+src/**
+tsconfig.json
+**/*.map
+**/*.vsix
+CLAUDE.md
+ICONS.md

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <rect width="128" height="128" rx="16" fill="#1e1e1e"/>
+  <text x="64" y="78" font-family="Segoe UI, Arial, sans-serif" font-size="56" font-weight="bold" fill="#569cd6" text-anchor="middle">⚡</text>
+  <rect x="20" y="92" width="24" height="8" rx="2" fill="#4ec9b0" opacity="0.9"/>
+  <rect x="48" y="92" width="30" height="8" rx="2" fill="#ce9178" opacity="0.9"/>
+  <rect x="82" y="92" width="26" height="8" rx="2" fill="#dcdcaa" opacity="0.9"/>
+</svg>
