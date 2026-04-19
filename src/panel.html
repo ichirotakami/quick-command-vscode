@@ -1,0 +1,214 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <link href="{{codiconsUri}}" rel="stylesheet" />
+    <style>
+      body {
+        margin: 0;
+        padding: 8px;
+        font-family: var(--vscode-font-family);
+        font-size: var(--vscode-font-size);
+        color: var(--vscode-foreground);
+      }
+      .section {
+        margin: 0;
+      }
+      .section-title {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        opacity: 0.7;
+        margin-bottom: 4px;
+        padding: 0 2px;
+      }
+      .btn-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+      }
+      .btn {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 10px;
+        border: 1px solid var(--vscode-button-border, transparent);
+        border-radius: 4px;
+        background: var(--vscode-button-secondaryBackground);
+        color: var(--vscode-button-secondaryForeground);
+        cursor: pointer;
+        font-size: 12px;
+        white-space: nowrap;
+        line-height: 1.4;
+        transition: opacity 0.15s;
+      }
+      .btn:hover {
+        background: var(--vscode-button-secondaryHoverBackground);
+      }
+      .btn:active {
+        opacity: 0.7;
+      }
+      .btn.sent {
+        opacity: 0.5;
+        pointer-events: none;
+      }
+      .btn-exec {
+        color: var(--vscode-terminal-ansiGreen, #89d185);
+      }
+      .dropdown-wrapper {
+        position: relative;
+        display: inline-block;
+        z-index: 0;
+      }
+      .dropdown-wrapper.active {
+        z-index: 10;
+      }
+      .dropdown-toggle {
+        justify-content: flex-start;
+      }
+      .dropdown-toggle .toggle-arrow {
+        margin-left: auto;
+        font-size: 12px;
+        transition: transform 0.15s;
+      }
+      .dropdown-toggle.open .toggle-arrow {
+        transform: rotate(180deg);
+      }
+      .dropdown-menu {
+        display: none;
+        position: absolute;
+        left: 0;
+        min-width: 100%;
+        margin-top: 2px;
+        border: 1px solid var(--vscode-focusBorder, #007fd4);
+        border-radius: 4px;
+        background-color: var(--vscode-menu-background, #252526);
+        opacity: 1;
+        overflow: hidden;
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.6);
+        z-index: 100;
+      }
+      .dropdown-menu.show {
+        display: block;
+      }
+      .dropdown-item {
+        padding: 5px 10px;
+        font-size: 12px;
+        cursor: pointer;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        background-color: inherit;
+      }
+      .dropdown-item:hover {
+        background: var(--vscode-list-hoverBackground);
+      }
+      .dropdown-item:active {
+        opacity: 0.7;
+      }
+      .dropdown-item-exec {
+        color: var(--vscode-terminal-ansiGreen, #89d185);
+      }
+      .dropdown-item + .dropdown-item {
+        border-top: 1px solid var(--vscode-panel-border);
+      }
+      .codicon {
+        font-size: 14px;
+      }
+      .divider {
+        height: 1px;
+        background: var(--vscode-panel-border);
+        margin: 8px 0;
+      }
+      .divider.thick {
+        height: 2px;
+        margin: 12px 0;
+      }
+      .group-header {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 11px;
+        font-weight: 700;
+        opacity: 0.6;
+        margin-bottom: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      .empty {
+        opacity: 0.5;
+        font-size: 12px;
+        padding: 12px 0;
+      }
+    </style>
+  </head>
+  <body>
+    {{body}}
+    <script>
+      const vscode = acquireVsCodeApi();
+
+      // Single command buttons
+      document.querySelectorAll('.btn[data-cmd]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const cmdJson = btn.getAttribute('data-cmd');
+          const execute = btn.getAttribute('data-execute') === 'true';
+          if (cmdJson) {
+            const command = JSON.parse(cmdJson);
+            vscode.postMessage({ type: 'run', command, execute });
+            btn.classList.add('sent');
+            setTimeout(() => btn.classList.remove('sent'), 300);
+          }
+        });
+      });
+
+      // Dropdown toggles
+      document.querySelectorAll('.dropdown-toggle').forEach((toggle) => {
+        toggle.addEventListener('click', () => {
+          const wrapper = toggle.parentElement;
+          const menu = toggle.nextElementSibling;
+          const isOpen = toggle.classList.contains('open');
+          // Close all other dropdowns
+          document.querySelectorAll('.dropdown-toggle.open').forEach((t) => {
+            t.classList.remove('open');
+            t.parentElement.classList.remove('active');
+            t.nextElementSibling.classList.remove('show');
+          });
+          if (!isOpen) {
+            toggle.classList.add('open');
+            wrapper.classList.add('active');
+            menu.classList.add('show');
+          }
+        });
+      });
+
+      // Click outside to close dropdowns
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('.dropdown-wrapper')) {
+          document.querySelectorAll('.dropdown-toggle.open').forEach((t) => {
+            t.classList.remove('open');
+            t.parentElement.classList.remove('active');
+            t.nextElementSibling.classList.remove('show');
+          });
+        }
+      });
+
+      // Dropdown items
+      document.querySelectorAll('.dropdown-item[data-cmd]').forEach((item) => {
+        item.addEventListener('click', () => {
+          const cmdJson = item.getAttribute('data-cmd');
+          const execute = item.getAttribute('data-execute') === 'true';
+          if (cmdJson) {
+            const command = JSON.parse(cmdJson);
+            vscode.postMessage({ type: 'run', command, execute });
+            item.style.opacity = '0.5';
+            setTimeout(() => (item.style.opacity = ''), 300);
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

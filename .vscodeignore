@@ -2,6 +2,7 @@
 node_modules/**
 !node_modules/@vscode/codicons/dist/**
 src/**
+!src/panel.html
 tsconfig.json
 **/*.map
 **/*.vsix

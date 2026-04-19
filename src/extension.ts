@@ -1,4 +1,6 @@
 import * as vscode from 'vscode';
+import * as fs from 'fs';
+import * as path from 'path';
 
 type ShowInTarget = 'all' | 'sidebar' | 'statusbar';
 
@@ -16,6 +18,16 @@ interface ButtonConfig {
   execute?: boolean;
   showIn?: ShowInTarget[];
   group?: SubCommand[];
+}
+
+function getExecColor(): string {
+  const kind = vscode.window.activeColorTheme.kind;
+  // Light / HighContrastLight
+  if (kind === vscode.ColorThemeKind.Light || kind === vscode.ColorThemeKind.HighContrastLight) {
+    return '#bf8803';
+  }
+  // Dark / HighContrast
+  return '#4ec9b0';
 }
 
 function shouldShowIn(target: ShowInTarget, item: { showIn?: ShowInTarget[] }): boolean {
@@ -73,24 +85,24 @@ class QuickCommandViewProvider implements vscode.WebviewViewProvider {
         if (!shouldShowIn('sidebar', btn)) {
           return;
         }
-        flushSingles();
-        const subBtns = btn.group
+        const subItems = btn.group
           .filter((sub) => shouldShowIn('sidebar', sub))
           .map((sub) => {
             const cmdJson = JSON.stringify(sub.command);
             const tipStr = Array.isArray(sub.command) ? sub.command.join(' && ') : sub.command;
             const execFlag = sub.execute ? 'true' : 'false';
-            return `<button class="btn btn-sub ${sub.execute ? 'btn-exec' : ''}" data-cmd='${escAttr(cmdJson)}' data-execute="${execFlag}" title="${escHtml(tipStr)}">${escHtml(sub.label)}</button>`;
+            return `<div class="dropdown-item ${sub.execute ? 'dropdown-item-exec' : ''}" data-cmd='${escAttr(cmdJson)}' data-execute="${execFlag}" title="${escHtml(tipStr)}">${escHtml(sub.label)}</div>`;
           })
           .join('');
-        if (subBtns) {
-          sections.push(`
-            <div class="section">
-              <div class="section-title">
+        if (subItems) {
+          singleBtns.push(`
+            <div class="dropdown-wrapper">
+              <button class="btn dropdown-toggle">
                 <span class="codicon codicon-${escHtml(btn.icon || 'list-flat')}"></span>
                 ${escHtml(btn.label)}
-              </div>
-              <div class="btn-row">${subBtns}</div>
+                <span class="codicon codicon-chevron-down toggle-arrow"></span>
+              </button>
+              <div class="dropdown-menu">${subItems}</div>
             </div>`);
         }
       } else {
@@ -135,121 +147,9 @@ class QuickCommandViewProvider implements vscode.WebviewViewProvider {
     }
     const body = parts.join('<div class="divider thick"></div>');
 
-    return /*html*/ `<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<link href="${codiconsUri}" rel="stylesheet" />
-<style>
-  body {
-    margin: 0;
-    padding: 8px;
-    font-family: var(--vscode-font-family);
-    font-size: var(--vscode-font-size);
-    color: var(--vscode-foreground);
-  }
-  .section {
-    margin: 0;
-  }
-  .section-title {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    opacity: 0.7;
-    margin-bottom: 4px;
-    padding: 0 2px;
-  }
-  .btn-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-  }
-  .btn {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 4px 10px;
-    border: 1px solid var(--vscode-button-border, transparent);
-    border-radius: 4px;
-    background: var(--vscode-button-secondaryBackground);
-    color: var(--vscode-button-secondaryForeground);
-    cursor: pointer;
-    font-size: 12px;
-    white-space: nowrap;
-    line-height: 1.4;
-    transition: opacity 0.15s;
-  }
-  .btn:hover {
-    background: var(--vscode-button-secondaryHoverBackground);
-  }
-  .btn:active {
-    opacity: 0.7;
-  }
-  .btn.sent {
-    opacity: 0.5;
-    pointer-events: none;
-  }
-  .btn-sub {
-    padding: 3px 8px;
-    font-size: 11px;
-  }
-  .btn-exec {
-    color: var(--vscode-terminal-ansiGreen, #89d185);
-  }
-  .codicon {
-    font-size: 14px;
-  }
-  .divider {
-    height: 1px;
-    background: var(--vscode-panel-border);
-    margin: 8px 0;
-  }
-  .divider.thick {
-    height: 2px;
-    margin: 12px 0;
-  }
-  .group-header {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 11px;
-    font-weight: 700;
-    opacity: 0.6;
-    margin-bottom: 6px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-  .empty {
-    opacity: 0.5;
-    font-size: 12px;
-    padding: 12px 0;
-  }
-</style>
-</head>
-<body>
-  ${body}
-<script>
-  const vscode = acquireVsCodeApi();
-  document.querySelectorAll('.btn[data-cmd]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const cmdJson = btn.getAttribute('data-cmd');
-      const execute = btn.getAttribute('data-execute') === 'true';
-      if (cmdJson) {
-        const command = JSON.parse(cmdJson);
-        vscode.postMessage({ type: 'run', command, execute });
-        // Visual feedback
-        btn.classList.add('sent');
-        setTimeout(() => btn.classList.remove('sent'), 300);
-      }
-    });
-  });
-</script>
-</body>
-</html>`;
+    const templatePath = path.join(this._context.extensionPath, 'src', 'panel.html');
+    const template = fs.readFileSync(templatePath, 'utf8');
+    return template.replace('{{codiconsUri}}', codiconsUri.toString()).replace('{{body}}', body);
   }
 }
 
@@ -274,6 +174,9 @@ export function activate(context: vscode.ExtensionContext) {
   );
 
   context.subscriptions.push(
+    vscode.commands.registerCommand('quickCommand.openIconListing', () => {
+      vscode.env.openExternal(vscode.Uri.parse('https://code.visualstudio.com/api/references/icons-in-labels#icon-listing'));
+    }),
     vscode.commands.registerCommand('quickCommand.refreshButtons', () => {
       rebuildAll();
     }),
@@ -303,6 +206,9 @@ export function activate(context: vscode.ExtensionContext) {
       if (e.affectsConfiguration('quickCommand.buttons') || e.affectsConfiguration('quickCommand.workspaceButtons')) {
         rebuildAll();
       }
+    }),
+    vscode.window.onDidChangeActiveColorTheme(() => {
+      rebuildAll();
     }),
   );
 }
@@ -352,26 +258,6 @@ function rebuildAll() {
       statusBarItems.push(item);
       topCount++;
       cmdIndex++;
-
-      // Sub-commands pinned to statusbar don't count toward the limit
-      btn.group.forEach((sub) => {
-        if (!shouldShowIn('statusbar', sub)) { return; }
-        const subCommandId = `quickCommand.run.${cmdIndex}`;
-        const subDisp = vscode.commands.registerCommand(subCommandId, () =>
-          sendToTerminal(sub.command, sub.execute ?? false),
-        );
-        dynamicDisposables.push(subDisp);
-
-        const subItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 10000 - cmdIndex);
-        subItem.text = sub.label;
-        if (sub.execute) { subItem.color = new vscode.ThemeColor('terminal.ansiGreen'); }
-        subItem.command = subCommandId;
-        const subCmdStr = Array.isArray(sub.command) ? sub.command.join(' && ') : sub.command;
-        subItem.tooltip = subCmdStr;
-        subItem.show();
-        statusBarItems.push(subItem);
-        cmdIndex++;
-      });
     } else {
       const commandId = `quickCommand.run.${cmdIndex}`;
       const cmdDisp = vscode.commands.registerCommand(commandId, () => executeButton(btn));
@@ -380,7 +266,9 @@ function rebuildAll() {
       const item = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 10000 - cmdIndex);
       const iconStr = btn.icon ? `$(${btn.icon}) ` : '';
       item.text = `${iconStr}${btn.label}`;
-      if (btn.execute) { item.color = new vscode.ThemeColor('terminal.ansiGreen'); }
+      if (btn.execute) {
+        item.color = getExecColor();
+      }
       item.command = commandId;
       const cmdStr = Array.isArray(btn.command) ? btn.command.join(' && ') : btn.command || '';
       item.tooltip = cmdStr;

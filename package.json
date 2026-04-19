@@ -3,7 +3,7 @@
   "displayName": "Quick Command",
   "publisher": "obroom",
   "description": "Provides quick command buttons for the terminal. Click to send commands instantly.",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "repository": {
     "type": "git",
     "url": "https://github.com/kookob/quick-command.git"
@@ -35,7 +35,7 @@
           "icon": "$(zap)",
           "type": "webview",
           "id": "quickCommand.buttonsView",
-          "name": "Commands"
+          "name": ""
         }
       ]
     },
@@ -127,7 +127,14 @@
               },
               "showIn": {
                 "type": "array",
-                "items": { "type": "string", "enum": ["all", "sidebar", "statusbar"] },
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "all",
+                    "sidebar",
+                    "statusbar"
+                  ]
+                },
                 "default": [],
                 "description": "Where to show this button. Options: \"all\", \"sidebar\", \"statusbar\". Default: [] (show everywhere)"
               },
@@ -159,7 +166,14 @@
                     },
                     "showIn": {
                       "type": "array",
-                      "items": { "type": "string", "enum": ["all", "sidebar", "statusbar"] },
+                      "items": {
+                        "type": "string",
+                        "enum": [
+                          "all",
+                          "sidebar",
+                          "statusbar"
+                        ]
+                      },
                       "default": [],
                       "description": "Where to show this sub-command. Options: \"all\", \"sidebar\", \"statusbar\". Default: [] (show everywhere)"
                     }
@@ -206,7 +220,14 @@
               },
               "showIn": {
                 "type": "array",
-                "items": { "type": "string", "enum": ["all", "sidebar", "statusbar"] },
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "all",
+                    "sidebar",
+                    "statusbar"
+                  ]
+                },
                 "default": [],
                 "description": "Where to show this button. Options: \"all\", \"sidebar\", \"statusbar\". Default: [] (show everywhere)"
               },
@@ -238,7 +259,14 @@
                     },
                     "showIn": {
                       "type": "array",
-                      "items": { "type": "string", "enum": ["all", "sidebar", "statusbar"] },
+                      "items": {
+                        "type": "string",
+                        "enum": [
+                          "all",
+                          "sidebar",
+                          "statusbar"
+                        ]
+                      },
                       "default": [],
                       "description": "Where to show this sub-command. Options: \"all\", \"sidebar\", \"statusbar\". Default: [] (show everywhere)"
                     }
@@ -252,6 +280,11 @@
     },
     "commands": [
       {
+        "command": "quickCommand.openIconListing",
+        "title": "Quick Command: Icon Listing",
+        "icon": "$(link-external)"
+      },
+      {
         "command": "quickCommand.refreshButtons",
         "title": "Quick Command: Refresh Buttons",
         "icon": "$(refresh)"
@@ -264,6 +297,11 @@
     ],
     "menus": {
       "view/title": [
+        {
+          "command": "quickCommand.openIconListing",
+          "when": "view == quickCommand.buttonsView",
+          "group": "navigation@0"
+        },
         {
           "command": "quickCommand.refreshButtons",
           "when": "view == quickCommand.buttonsView",
