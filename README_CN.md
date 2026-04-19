@@ -17,7 +17,7 @@
 
 ### 状态栏按钮
 
-任意按钮都可以通过设置 `"showInStatusBar": true` 固定到底部状态栏。分组按钮显示为下拉菜单，子命令也可以单独固定。
+任意按钮都可以通过设置 `"showIn": ["statusbar"]` 固定到底部状态栏。分组按钮显示为下拉菜单，子命令也可以单独固定。
 
 ### 核心功能
 
@@ -47,10 +47,10 @@ Quick Command 使用两个配置项：
 | `icon` | `string` | `"terminal"` | [Codicon](https://code.visualstudio.com/api/references/icons-in-labels#icon-listing) 图标名称 |
 | `command` | `string \| string[]` | — | 发送到终端的命令，支持单条或多条 |
 | `execute` | `boolean` | `false` | 是否自动回车执行 |
-| `showInStatusBar` | `boolean` | `false` | 是否固定到底部状态栏 |
+| `showIn` | `("all" \| "sidebar" \| "statusbar")[]` | `[]` | 控制按钮显示在侧边栏、状态栏或两者 |
 | `group` | `SubCommand[]` | — | 子命令列表（使按钮成为分组按钮） |
 
-子命令支持 `label`、`command`、`execute`、`showInStatusBar` 属性。
+子命令支持 `label`、`command`、`execute`、`showIn` 属性。
 
 ### 配置示例
 
@@ -64,7 +64,7 @@ Quick Command 使用两个配置项：
       "icon": "play",
       "command": "npm run dev",
       "execute": true,
-      "showInStatusBar": true
+      "showIn": ["sidebar", "statusbar"]
     },
     {
       "label": "构建",
@@ -128,6 +128,8 @@ Quick Command 使用两个配置项：
 - `"execute": true` — 命令发送后自动回车执行
 
 `execute: true` 的按钮在侧边栏面板中会显示一个绿色圆点标识。
+
+你也可以使用 `Settings` 动作打开菜单，直接跳转配置，或者一键复制可直接粘贴的单按钮/分组按钮 JSON 示例。
 
 ## 面板操作
 

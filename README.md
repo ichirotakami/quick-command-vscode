@@ -17,7 +17,7 @@ Group commands are displayed with a section title and inline sub-command buttons
 
 ### Status Bar Buttons
 
-Any button can optionally be pinned to the bottom status bar by setting `"showInStatusBar": true`. Group buttons appear as dropdowns, and individual sub-commands can also be pinned separately.
+Any button can optionally be pinned to the bottom status bar by setting `"showIn": ["statusbar"]`. Group buttons appear as dropdowns, and individual sub-commands can also be pinned separately.
 
 ### Key Features
 
@@ -47,10 +47,10 @@ Quick Command uses two configuration keys:
 | `icon` | `string` | `"terminal"` | [Codicon](https://code.visualstudio.com/api/references/icons-in-labels#icon-listing) icon name |
 | `command` | `string \| string[]` | — | Command(s) to send to terminal |
 | `execute` | `boolean` | `false` | Auto-press Enter after sending |
-| `showInStatusBar` | `boolean` | `false` | Pin this button to the status bar |
+| `showIn` | `("all" \| "sidebar" \| "statusbar")[]` | `[]` | Control whether the button appears in the sidebar, status bar, or both |
 | `group` | `SubCommand[]` | — | Sub-commands (makes this a group button) |
 
-Sub-commands support `label`, `command`, `execute`, and `showInStatusBar`.
+Sub-commands support `label`, `command`, `execute`, and `showIn`.
 
 ### Examples
 
@@ -64,7 +64,7 @@ Sub-commands support `label`, `command`, `execute`, and `showInStatusBar`.
       "icon": "play",
       "command": "npm run dev",
       "execute": true,
-      "showInStatusBar": true
+      "showIn": ["sidebar", "statusbar"]
     },
     {
       "label": "Build",
@@ -128,6 +128,8 @@ When `execute` is `true`, all lines are sent with Enter. When `false`, the last 
 - `"execute": true` — Command is sent and executed immediately.
 
 Buttons with `execute: true` show a green dot indicator in the sidebar panel.
+
+Use the `Settings` action to open a menu that can either jump to settings JSON or copy a ready-to-paste single-button or group-button example.
 
 ## Panel Actions
 

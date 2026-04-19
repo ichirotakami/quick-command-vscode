@@ -20,11 +20,31 @@ interface ButtonConfig {
   group?: SubCommand[];
 }
 
+const BUTTON_EXAMPLES: Record<'single' | 'group', ButtonConfig> = {
+  single: {
+    label: 'Dev',
+    icon: 'play',
+    command: 'npm run dev',
+    execute: false,
+    showIn: ['sidebar', 'statusbar'],
+  },
+  group: {
+    label: 'Git',
+    icon: 'git-merge',
+    showIn: ['sidebar', 'statusbar'],
+    group: [
+      { label: 'Pull', command: 'git pull', execute: false, showIn: ['sidebar'] },
+      { label: 'Push', command: 'git push', execute: false, showIn: ['sidebar'] },
+      { label: 'Status', command: 'git status', execute: true, showIn: ['sidebar', 'statusbar'] },
+    ],
+  },
+};
+
 function getExecColor(): string {
   const kind = vscode.window.activeColorTheme.kind;
   // Light / HighContrastLight
   if (kind === vscode.ColorThemeKind.Light || kind === vscode.ColorThemeKind.HighContrastLight) {
-    return '#bf8803';
+    return '#d8fff3';
   }
   // Dark / HighContrast
   return '#4ec9b0';
@@ -142,7 +162,7 @@ class QuickCommandViewProvider implements vscode.WebviewViewProvider {
     }
     if (parts.length === 0) {
       parts.push(
-        '<div class="empty">No commands configured. Click <span class="codicon codicon-gear"></span> above to add.</div>',
+        '<div class="empty">No commands configured. Click <span class="codicon codicon-gear"></span> to edit settings or copy an example.</div>',
       );
     }
     const body = parts.join('<div class="divider thick"></div>');
@@ -175,26 +195,49 @@ export function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(
     vscode.commands.registerCommand('quickCommand.openIconListing', () => {
-      vscode.env.openExternal(vscode.Uri.parse('https://code.visualstudio.com/api/references/icons-in-labels#icon-listing'));
+      vscode.env.openExternal(
+        vscode.Uri.parse('https://code.visualstudio.com/api/references/icons-in-labels#icon-listing'),
+      );
     }),
     vscode.commands.registerCommand('quickCommand.refreshButtons', () => {
       rebuildAll();
     }),
     vscode.commands.registerCommand('quickCommand.openSettings', async () => {
       const items = [
-        { label: '$(account) Global Settings', description: 'quickCommand.buttons', target: 'user' },
-        { label: '$(folder) Workspace Settings', description: 'quickCommand.workspaceButtons', target: 'workspace' },
+        { label: '$(account) Global Settings', description: 'quickCommand.buttons', action: 'open-user' as const },
+        {
+          label: '$(folder) Workspace Settings',
+          description: 'quickCommand.workspaceButtons',
+          action: 'open-workspace' as const,
+        },
+        {
+          label: '$(copy) Copy Single Button Example',
+          description: 'Paste into quickCommand.buttons or quickCommand.workspaceButtons',
+          action: 'copy-single' as const,
+        },
+        {
+          label: '$(copy) Copy Group Button Example',
+          description: 'Paste into quickCommand.buttons or quickCommand.workspaceButtons',
+          action: 'copy-group' as const,
+        },
       ];
-      const picked = await vscode.window.showQuickPick(items, { placeHolder: 'Select which settings to edit' });
+      const picked = await vscode.window.showQuickPick(items, { placeHolder: 'Edit settings or copy an example' });
       if (!picked) {
         return;
       }
-      if (picked.target === 'user') {
-        vscode.commands.executeCommand('workbench.action.openSettingsJson', {
-          revealSetting: { key: 'quickCommand.buttons' },
-        });
-      } else {
-        vscode.commands.executeCommand('workbench.action.openWorkspaceSettingsFile');
+      switch (picked.action) {
+        case 'open-user':
+          await openSettingsJson('user');
+          break;
+        case 'open-workspace':
+          await openSettingsJson('workspace');
+          break;
+        case 'copy-single':
+          await copyExample('single');
+          break;
+        case 'copy-group':
+          await copyExample('group');
+          break;
       }
     }),
   );
@@ -222,6 +265,24 @@ function getAllButtons(): { userButtons: ButtonConfig[]; workspaceButtons: Butto
   return { userButtons, workspaceButtons };
 }
 
+async function copyExample(example: 'single' | 'group') {
+  const snippet = JSON.stringify(BUTTON_EXAMPLES[example], null, 2);
+  await vscode.env.clipboard.writeText(snippet);
+  vscode.window.showInformationMessage(
+    `Copied ${example} button example. Paste it into quickCommand.buttons or quickCommand.workspaceButtons.`,
+  );
+}
+
+async function openSettingsJson(target: 'user' | 'workspace') {
+  if (target === 'user') {
+    await vscode.commands.executeCommand('workbench.action.openSettingsJson', {
+      revealSetting: { key: 'quickCommand.buttons' },
+    });
+    return;
+  }
+  await vscode.commands.executeCommand('workbench.action.openWorkspaceSettingsFile');
+}
+
 function rebuildAll() {
   // Dispose old resources (managed separately, not in context.subscriptions)
   statusBarItems.forEach((item) => item.dispose());
@@ -237,8 +298,12 @@ function rebuildAll() {
   let cmdIndex = 0;
 
   allButtons.forEach((btn) => {
-    if (topCount >= MAX_STATUSBAR_ITEMS) { return; }
-    if (!shouldShowIn('statusbar', btn)) { return; }
+    if (topCount >= MAX_STATUSBAR_ITEMS) {
+      return;
+    }
+    if (!shouldShowIn('statusbar', btn)) {
+      return;
+    }
 
     if (btn.group) {
       const commandId = `quickCommand.run.${cmdIndex}`;

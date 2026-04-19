@@ -14,9 +14,9 @@ VSCode extension that provides quick command buttons for the terminal. Click to 
 - Click feedback animation (brief opacity change)
 
 ### 2. Status Bar Buttons
-- Only shown for buttons with `"showInStatusBar": true` (default: false)
+- Only shown for buttons whose `showIn` includes `"statusbar"`
 - `StatusBarAlignment.Right` with high priority (10000-N) to appear on the left side of right-aligned area
-- Group buttons show as dropdown (QuickPick), sub-commands with `showInStatusBar: true` also appear individually
+- Group buttons show as dropdown (QuickPick), sub-commands whose `showIn` includes `"statusbar"` also appear individually
 - Tooltip shows actual command (Markdown for groups)
 
 ### 3. Configuration
@@ -35,16 +35,16 @@ Button schema:
   "icon": "play",
   "command": "npm run dev",
   "execute": false,
-  "showInStatusBar": false,
+  "showIn": ["sidebar"],
   "group": [
-    { "label": "Sub", "command": "cmd", "execute": true, "showInStatusBar": false }
+    { "label": "Sub", "command": "cmd", "execute": true, "showIn": ["statusbar"] }
   ]
 }
 ```
 
 - `command`: string or string[] (multi-line, sent sequentially)
 - `execute`: auto-press Enter after last line (default: false)
-- `showInStatusBar`: show in bottom status bar (default: false)
+- `showIn`: controls sidebar / statusbar visibility; omitted means show everywhere
 
 ### 4. Panel Title Bar Actions
 - Refresh button (navigation@1) — rebuilds all buttons from config
