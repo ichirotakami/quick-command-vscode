@@ -34,21 +34,21 @@
 
 Quick Command 使用两个配置项：
 
-| 配置键 | 作用域 | 说明 |
-|--------|--------|------|
-| `quickCommand.buttons` | 用户（全局） | 所有项目共享的通用命令 |
-| `quickCommand.workspaceButtons` | 工作区 | 仅当前项目的专属命令 |
+| 配置键                          | 作用域       | 说明                   |
+| ------------------------------- | ------------ | ---------------------- |
+| `quickCommand.buttons`          | 用户（全局） | 所有项目共享的通用命令 |
+| `quickCommand.workspaceButtons` | 工作区       | 仅当前项目的专属命令   |
 
 ### 按钮属性
 
-| 属性 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
-| `label` | `string` | — | 按钮显示文字（必填） |
-| `icon` | `string` | `"terminal"` | [Codicon](https://code.visualstudio.com/api/references/icons-in-labels#icon-listing) 图标名称 |
-| `command` | `string \| string[]` | — | 发送到终端的命令，支持单条或多条 |
-| `execute` | `boolean` | `false` | 是否自动回车执行 |
-| `showIn` | `("all" \| "sidebar" \| "statusbar")[]` | `[]` | 控制按钮显示在侧边栏、状态栏或两者 |
-| `group` | `SubCommand[]` | — | 子命令列表（使按钮成为分组按钮） |
+| 属性      | 类型                                    | 默认值       | 说明                                                                                          |
+| --------- | --------------------------------------- | ------------ | --------------------------------------------------------------------------------------------- |
+| `label`   | `string`                                | —            | 按钮显示文字（必填）                                                                          |
+| `icon`    | `string`                                | `"terminal"` | [Codicon](https://code.visualstudio.com/api/references/icons-in-labels#icon-listing) 图标名称 |
+| `command` | `string \| string[]`                    | —            | 发送到终端的命令，支持单条或多条                                                              |
+| `execute` | `boolean`                               | `false`      | 是否自动回车执行                                                                              |
+| `showIn`  | `("all" \| "sidebar" \| "statusbar")[]` | `[]`         | 控制按钮显示在侧边栏、状态栏或两者                                                            |
+| `group`   | `SubCommand[]`                          | —            | 子命令列表（使按钮成为分组按钮）                                                              |
 
 子命令支持 `label`、`command`、`execute`、`showIn` 属性。
 
@@ -129,7 +129,7 @@ Quick Command 使用两个配置项：
 
 `execute: true` 的按钮在侧边栏面板中会显示一个绿色圆点标识。
 
-你也可以使用 `Settings` 动作打开菜单，直接跳转配置，或者一键复制可直接粘贴的单按钮/分组按钮 JSON 示例。
+你也可以使用 `Settings` 动作打开菜单，直接跳转全局或项目配置，一键复制可直接粘贴的单按钮/分组按钮 JSON 示例，或打开 Codicon 图标目录。
 
 ## 面板操作
 
@@ -140,16 +140,14 @@ Quick Command 使用两个配置项：
 
 ## 常用图标
 
-| 图标 | 名称 | 图标 | 名称 |
-|------|------|------|------|
-| ▶ | `play` | ■ | `debug-stop` |
-| 📦 | `package` | 🧪 | `beaker` |
-| 🚀 | `rocket` | ⚙ | `gear` |
-| 🔀 | `git-merge` | 📋 | `output` |
-| ⚡ | `zap` | 🔧 | `tools` |
+| 图标 | 名称        | 图标 | 名称         |
+| ---- | ----------- | ---- | ------------ |
+| ▶    | `play`      | ■    | `debug-stop` |
+| 📦   | `package`   | 🧪   | `beaker`     |
+| 🚀   | `rocket`    | ⚙    | `gear`       |
+| 🔀   | `git-merge` | 📋   | `output`     |
+| ⚡   | `zap`       | 🔧   | `tools`      |
 
 完整列表：[VS Code Codicon 图标参考](https://code.visualstudio.com/api/references/icons-in-labels#icon-listing)
 
 ## 许可证
-
-MIT

@@ -281,7 +281,7 @@
     "commands": [
       {
         "command": "quickCommand.openIconListing",
-        "title": "Quick Command: Icon Listing",
+        "title": "Quick Command: Browse Icons",
         "icon": "$(link-external)"
       },
       {
@@ -298,19 +298,14 @@
     "menus": {
       "view/title": [
         {
-          "command": "quickCommand.openIconListing",
+          "command": "quickCommand.refreshButtons",
           "when": "view == quickCommand.buttonsView",
           "group": "navigation@0"
         },
         {
-          "command": "quickCommand.refreshButtons",
-          "when": "view == quickCommand.buttonsView",
-          "group": "navigation@1"
-        },
-        {
           "command": "quickCommand.openSettings",
           "when": "view == quickCommand.buttonsView",
-          "group": "navigation@2"
+          "group": "navigation@1"
         }
       ]
     }

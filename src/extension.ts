@@ -206,7 +206,7 @@ export function activate(context: vscode.ExtensionContext) {
       const items = [
         { label: '$(account) Global Settings', description: 'quickCommand.buttons', action: 'open-user' as const },
         {
-          label: '$(folder) Workspace Settings',
+          label: '$(folder) Project Settings',
           description: 'quickCommand.workspaceButtons',
           action: 'open-workspace' as const,
         },
@@ -220,8 +220,15 @@ export function activate(context: vscode.ExtensionContext) {
           description: 'Paste into quickCommand.buttons or quickCommand.workspaceButtons',
           action: 'copy-group' as const,
         },
+        {
+          label: 'Browse Icons $(link-external)',
+          description: 'Open the VS Code codicon icon listing in your browser',
+          action: 'open-icons' as const,
+        },
       ];
-      const picked = await vscode.window.showQuickPick(items, { placeHolder: 'Edit settings or copy an example' });
+      const picked = await vscode.window.showQuickPick(items, {
+        placeHolder: 'Open settings, copy an example, or browse the codicon catalog',
+      });
       if (!picked) {
         return;
       }
@@ -237,6 +244,9 @@ export function activate(context: vscode.ExtensionContext) {
           break;
         case 'copy-group':
           await copyExample('group');
+          break;
+        case 'open-icons':
+          await vscode.commands.executeCommand('quickCommand.openIconListing');
           break;
       }
     }),

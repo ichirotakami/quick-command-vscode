@@ -129,7 +129,7 @@ When `execute` is `true`, all lines are sent with Enter. When `false`, the last 
 
 Buttons with `execute: true` show a green dot indicator in the sidebar panel.
 
-Use the `Settings` action to open a menu that can either jump to settings JSON or copy a ready-to-paste single-button or group-button example.
+Use the `Settings` action to open a menu that can jump to global or project settings, copy a ready-to-paste single-button or group-button example, or open the Codicon catalog in your browser.
 
 ## Panel Actions
 
