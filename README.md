@@ -154,4 +154,4 @@ Full list: [VS Code Codicon Reference](https://code.visualstudio.com/api/referen
 
 ## License
 
-MIT
+Apache License 2.0 — see [LICENSE.md](LICENSE.md).

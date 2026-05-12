@@ -1,9 +1,10 @@
 {
-  "name": "quick-command",
+  "name": "quick-command-vscode",
   "displayName": "Quick Command",
   "publisher": "obroom",
   "description": "Provides quick command buttons for the terminal. Click to send commands instantly.",
   "version": "0.1.0",
+  "license": "Apache-2.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/kookob/quick-command-vscode.git"

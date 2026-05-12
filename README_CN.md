@@ -153,3 +153,5 @@ Quick Command 使用两个配置项：
 完整列表：[VS Code Codicon 图标参考](https://code.visualstudio.com/api/references/icons-in-labels#icon-listing)
 
 ## 许可证
+
+Apache License 2.0 — 详见 [LICENSE.md](LICENSE.md)。
