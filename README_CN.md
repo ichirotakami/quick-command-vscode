@@ -4,6 +4,8 @@
 
 [English](README.md)
 
+![Quick Command 截图](https://raw.githubusercontent.com/kookob/quick-command/main/images/screenshot.png)
+
 ## 功能特性
 
 ### 侧边栏面板

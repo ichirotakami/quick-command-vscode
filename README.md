@@ -4,6 +4,8 @@ A VS Code extension that provides quick command buttons for the terminal. Define
 
 [中文文档](README_CN.md)
 
+![Quick Command screenshot](https://raw.githubusercontent.com/kookob/quick-command/main/images/screenshot.png)
+
 ## Features
 
 ### Sidebar Panel
