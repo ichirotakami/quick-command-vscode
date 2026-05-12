@@ -1,6 +1,6 @@
 {
   "name": "quick-command-vscode",
-  "displayName": "Quick Command",
+  "displayName": "Quick Command - Terminal Buttons",
   "publisher": "obroom",
   "description": "Provides quick command buttons for the terminal. Click to send commands instantly.",
   "version": "0.1.0",
