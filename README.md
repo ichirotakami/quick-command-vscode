@@ -46,7 +46,7 @@ Quick Command uses two configuration keys:
 | Property | Type | Default | Description |
 |----------|------|---------|-------------|
 | `label` | `string` | — | Button display text (required) |
-| `icon` | `string` | `"terminal"` | [Codicon](https://code.visualstudio.com/api/references/icons-in-labels#icon-listing) icon name |
+| `icon` | `string` | `"terminal"` | [Codicon](https://code.visualstudio.com/api/references/icons-in-labels#icon-listing) icon name, or a brand icon (`"dbt"`, `"docker"`, `"pre-commit"`) |
 | `command` | `string \| string[]` | — | Command(s) to send to terminal |
 | `execute` | `boolean` | `false` | Auto-press Enter after sending |
 | `showIn` | `("all" \| "sidebar" \| "statusbar")[]` | `[]` | Control whether the button appears in the sidebar, status bar, or both |

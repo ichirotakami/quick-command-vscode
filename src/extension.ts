@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
+import iconManifest from './icons/manifest.json';
 
 type ShowInTarget = 'all' | 'sidebar' | 'statusbar';
 
@@ -18,6 +19,38 @@ interface ButtonConfig {
   execute?: boolean;
   showIn?: ShowInTarget[];
   group?: SubCommand[];
+}
+
+// Brand icons that codicons doesn't cover. Defined once in src/icons/manifest.json
+// (path data + font codepoint) and consumed from there both here and by
+// scripts/build-icons.py, which regenerates media/fonts/quick-command-icons.woff
+// and package.json's `contributes.icons` from the same file — see AGENTS.md.
+// Rendered as inline SVG in the sidebar webview; also contributed as a font via
+// `contributes.icons` in package.json (id below) so `$(themeIconId)` works in
+// native UI like the status bar.
+const CUSTOM_ICONS: Record<string, { svgPath: string; themeIconId: string }> = Object.fromEntries(
+  Object.entries(iconManifest).map(([key, icon]) => [
+    key,
+    { svgPath: `<path d="${icon.svgPath}"/>`, themeIconId: icon.themeIconId },
+  ]),
+);
+
+function renderIcon(name: string): string {
+  const custom = CUSTOM_ICONS[name];
+  if (custom) {
+    return `<svg class="custom-icon" viewBox="0 0 24 24" fill="currentColor" overflow="visible" xmlns="http://www.w3.org/2000/svg">${custom.svgPath}</svg>`;
+  }
+  return `<span class="codicon codicon-${escHtml(name)}"></span>`;
+}
+
+// Status bar text only understands codicon `$(name)` syntax; map our custom
+// icons to the theme icon id contributed via `contributes.icons`.
+function statusBarIconStr(icon: string | undefined): string {
+  if (!icon) {
+    return '';
+  }
+  const custom = CUSTOM_ICONS[icon];
+  return `$(${custom ? custom.themeIconId : icon}) `;
 }
 
 const BUTTON_EXAMPLES: Record<'single' | 'group', ButtonConfig> = {
@@ -118,7 +151,7 @@ class QuickCommandViewProvider implements vscode.WebviewViewProvider {
           singleBtns.push(`
             <div class="dropdown-wrapper">
               <button class="btn dropdown-toggle">
-                <span class="codicon codicon-${escHtml(btn.icon || 'list-flat')}"></span>
+                ${renderIcon(btn.icon || 'list-flat')}
                 ${escHtml(btn.label)}
                 <span class="codicon codicon-chevron-down toggle-arrow"></span>
               </button>
@@ -134,7 +167,7 @@ class QuickCommandViewProvider implements vscode.WebviewViewProvider {
         const execFlag = btn.execute ? 'true' : 'false';
         singleBtns.push(`
           <button class="btn ${btn.execute ? 'btn-exec' : ''}" data-cmd='${escAttr(cmdJson)}' data-execute="${execFlag}" title="${escHtml(tipStr)}">
-            <span class="codicon codicon-${escHtml(btn.icon || 'terminal')}"></span>
+            ${renderIcon(btn.icon || 'terminal')}
             ${escHtml(btn.label)}
           </button>`);
       }
@@ -321,7 +354,7 @@ function rebuildAll() {
       dynamicDisposables.push(cmdDisp);
 
       const item = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 10000 - cmdIndex);
-      const iconStr = btn.icon ? `$(${btn.icon}) ` : '';
+      const iconStr = statusBarIconStr(btn.icon);
       item.text = `${iconStr}${btn.label} $(chevron-down)`;
       item.command = commandId;
       const lines = btn.group.map((sub) => {
@@ -339,7 +372,7 @@ function rebuildAll() {
       dynamicDisposables.push(cmdDisp);
 
       const item = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 10000 - cmdIndex);
-      const iconStr = btn.icon ? `$(${btn.icon}) ` : '';
+      const iconStr = statusBarIconStr(btn.icon);
       item.text = `${iconStr}${btn.label}`;
       if (btn.execute) {
         item.color = getExecColor();

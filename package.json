@@ -1,13 +1,13 @@
 {
   "name": "quick-command-vscode",
   "displayName": "Quick Command - Terminal Buttons",
-  "publisher": "obroom",
+  "publisher": "ichirotakami",
   "description": "Provides quick command buttons for the terminal. Click to send commands instantly.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/kookob/quick-command-vscode.git"
+    "url": "https://github.com/ichirotakami/quick-command-vscode.git"
   },
   "icon": "icon.png",
   "engines": {
@@ -21,19 +21,49 @@
   ],
   "main": "./dist/extension.js",
   "contributes": {
+    "icons": {
+      "quick-command-knight": {
+        "description": "Chess knight",
+        "default": {
+          "fontPath": "./media/fonts/quick-command-icons.woff",
+          "fontCharacter": "\\E900"
+        }
+      },
+      "quick-command-dbt": {
+        "description": "dbt logo",
+        "default": {
+          "fontPath": "./media/fonts/quick-command-icons.woff",
+          "fontCharacter": "\\E901"
+        }
+      },
+      "quick-command-docker": {
+        "description": "Docker whale logo",
+        "default": {
+          "fontPath": "./media/fonts/quick-command-icons.woff",
+          "fontCharacter": "\\E902"
+        }
+      },
+      "quick-command-precommit": {
+        "description": "pre-commit logo",
+        "default": {
+          "fontPath": "./media/fonts/quick-command-icons.woff",
+          "fontCharacter": "\\E903"
+        }
+      }
+    },
     "viewsContainers": {
       "activitybar": [
         {
           "id": "quickCommandPanel",
           "title": "Quick Command",
-          "icon": "$(zap)"
+          "icon": "$(quick-command-knight)"
         }
       ]
     },
     "views": {
       "quickCommandPanel": [
         {
-          "icon": "$(zap)",
+          "icon": "$(quick-command-knight)",
           "type": "webview",
           "id": "quickCommand.buttonsView",
           "name": ""
@@ -314,7 +344,8 @@
   "scripts": {
     "build": "esbuild src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node",
     "watch": "npm run build -- --watch",
-    "package": "npm run build -- --minify"
+    "package": "npm run build -- --minify",
+    "icons:build": "python3 scripts/build-icons.py"
   },
   "devDependencies": {
     "@types/vscode": "^1.85.0",
