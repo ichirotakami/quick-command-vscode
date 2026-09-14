@@ -324,6 +324,11 @@
         "command": "quickCommand.openSettings",
         "title": "Quick Command: Edit Settings",
         "icon": "$(gear)"
+      },
+      {
+        "command": "quickCommand.openPanel",
+        "title": "Quick Command: Open",
+        "icon": "$(quick-command-knight)"
       }
     ],
     "menus": {
@@ -337,6 +342,12 @@
           "command": "quickCommand.openSettings",
           "when": "view == quickCommand.buttonsView",
           "group": "navigation@1"
+        }
+      ],
+      "editor/title": [
+        {
+          "command": "quickCommand.openPanel",
+          "group": "navigation"
         }
       ]
     }

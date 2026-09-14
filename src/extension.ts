@@ -53,26 +53,6 @@ function statusBarIconStr(icon: string | undefined): string {
   return `$(${custom ? custom.themeIconId : icon}) `;
 }
 
-const BUTTON_EXAMPLES: Record<'single' | 'group', ButtonConfig> = {
-  single: {
-    label: 'Dev',
-    icon: 'play',
-    command: 'npm run dev',
-    execute: false,
-    showIn: ['sidebar', 'statusbar'],
-  },
-  group: {
-    label: 'Git',
-    icon: 'git-merge',
-    showIn: ['sidebar', 'statusbar'],
-    group: [
-      { label: 'Pull', command: 'git pull', execute: false, showIn: ['sidebar'] },
-      { label: 'Push', command: 'git push', execute: false, showIn: ['sidebar'] },
-      { label: 'Status', command: 'git status', execute: true, showIn: ['sidebar', 'statusbar'] },
-    ],
-  },
-};
-
 function getExecColor(): string {
   const kind = vscode.window.activeColorTheme.kind;
   // Light / HighContrastLight
@@ -144,7 +124,7 @@ class QuickCommandViewProvider implements vscode.WebviewViewProvider {
             const cmdJson = JSON.stringify(sub.command);
             const tipStr = Array.isArray(sub.command) ? sub.command.join(' && ') : sub.command;
             const execFlag = sub.execute ? 'true' : 'false';
-            return `<div class="dropdown-item ${sub.execute ? 'dropdown-item-exec' : ''}" data-cmd='${escAttr(cmdJson)}' data-execute="${execFlag}" title="${escHtml(tipStr)}">${escHtml(sub.label)}</div>`;
+            return `<div class="dropdown-item ${sub.execute ? 'dropdown-item-exec' : ''}" data-cmd='${escAttr(cmdJson)}' data-execute="${execFlag}" data-tooltip="${escHtml(tipStr)}">${escHtml(sub.label)}</div>`;
           })
           .join('');
         if (subItems) {
@@ -166,7 +146,7 @@ class QuickCommandViewProvider implements vscode.WebviewViewProvider {
         const tipStr = Array.isArray(btn.command) ? (btn.command as string[]).join(' && ') : btn.command || '';
         const execFlag = btn.execute ? 'true' : 'false';
         singleBtns.push(`
-          <button class="btn ${btn.execute ? 'btn-exec' : ''}" data-cmd='${escAttr(cmdJson)}' data-execute="${execFlag}" title="${escHtml(tipStr)}">
+          <button class="btn ${btn.execute ? 'btn-exec' : ''}" data-cmd='${escAttr(cmdJson)}' data-execute="${execFlag}" data-tooltip="${escHtml(tipStr)}">
             ${renderIcon(btn.icon || 'terminal')}
             ${escHtml(btn.label)}
           </button>`);
@@ -235,6 +215,9 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand('quickCommand.refreshButtons', () => {
       rebuildAll();
     }),
+    vscode.commands.registerCommand('quickCommand.openPanel', () => {
+      vscode.commands.executeCommand('workbench.view.extension.quickCommandPanel');
+    }),
     vscode.commands.registerCommand('quickCommand.openSettings', async () => {
       const items = [
         { label: '$(account) Global Settings', description: 'quickCommand.buttons', action: 'open-user' as const },
@@ -244,23 +227,13 @@ export function activate(context: vscode.ExtensionContext) {
           action: 'open-workspace' as const,
         },
         {
-          label: '$(copy) Copy Single Button Example',
-          description: 'Paste into quickCommand.buttons or quickCommand.workspaceButtons',
-          action: 'copy-single' as const,
-        },
-        {
-          label: '$(copy) Copy Group Button Example',
-          description: 'Paste into quickCommand.buttons or quickCommand.workspaceButtons',
-          action: 'copy-group' as const,
-        },
-        {
           label: 'Browse Icons $(link-external)',
           description: 'Open the VS Code codicon icon listing in your browser',
           action: 'open-icons' as const,
         },
       ];
       const picked = await vscode.window.showQuickPick(items, {
-        placeHolder: 'Open settings, copy an example, or browse the codicon catalog',
+        placeHolder: 'Open settings or browse the codicon catalog',
       });
       if (!picked) {
         return;
@@ -271,12 +244,6 @@ export function activate(context: vscode.ExtensionContext) {
           break;
         case 'open-workspace':
           await openSettingsJson('workspace');
-          break;
-        case 'copy-single':
-          await copyExample('single');
-          break;
-        case 'copy-group':
-          await copyExample('group');
           break;
         case 'open-icons':
           await vscode.commands.executeCommand('quickCommand.openIconListing');
@@ -306,14 +273,6 @@ function getAllButtons(): { userButtons: ButtonConfig[]; workspaceButtons: Butto
   const userButtons = inspected?.globalValue ?? inspected?.defaultValue ?? [];
   const workspaceButtons = config.get<ButtonConfig[]>('workspaceButtons', []);
   return { userButtons, workspaceButtons };
-}
-
-async function copyExample(example: 'single' | 'group') {
-  const snippet = JSON.stringify(BUTTON_EXAMPLES[example], null, 2);
-  await vscode.env.clipboard.writeText(snippet);
-  vscode.window.showInformationMessage(
-    `Copied ${example} button example. Paste it into quickCommand.buttons or quickCommand.workspaceButtons.`,
-  );
 }
 
 async function openSettingsJson(target: 'user' | 'workspace') {

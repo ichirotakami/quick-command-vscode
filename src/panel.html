@@ -84,7 +84,7 @@
         left: 0;
         min-width: 100%;
         margin-top: 2px;
-        border: 1px solid var(--vscode-focusBorder, #007fd4);
+        border: 1px solid var(--vscode-menu-border, var(--vscode-panel-border, #454545));
         border-radius: 4px;
         background-color: var(--vscode-menu-background, #252526);
         opacity: 1;
@@ -148,6 +148,27 @@
         opacity: 0.5;
         font-size: 12px;
         padding: 12px 0;
+      }
+      .qc-tooltip {
+        position: fixed;
+        display: none;
+        width: max-content;
+        max-width: 215px;
+        padding: 4px 8px;
+        font-size: 11px;
+        line-height: 1.4;
+        color: var(--vscode-editorHoverWidget-foreground);
+        background: var(--vscode-editorHoverWidget-background);
+        border: 1px solid var(--vscode-editorHoverWidget-border);
+        border-radius: 5px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+        word-break: break-word;
+        white-space: normal;
+        z-index: 1000;
+        pointer-events: none;
+      }
+      .qc-tooltip.show {
+        display: block;
       }
     </style>
   </head>
@@ -213,6 +234,56 @@
             setTimeout(() => (item.style.opacity = ''), 300);
           }
         });
+      });
+
+      // Custom tooltip (replaces native title attribute, which was flaky)
+      const tooltip = document.createElement('div');
+      tooltip.className = 'qc-tooltip';
+      document.body.appendChild(tooltip);
+
+      let tooltipTimer = null;
+      const TOOLTIP_OFFSET_X = 6;
+      const TOOLTIP_OFFSET_Y = 18;
+
+      function positionTooltip(x, y) {
+        tooltip.style.left = x + TOOLTIP_OFFSET_X + 'px';
+        tooltip.style.top = y + TOOLTIP_OFFSET_Y + 'px';
+      }
+
+      function hideTooltip() {
+        if (tooltipTimer) {
+          clearTimeout(tooltipTimer);
+          tooltipTimer = null;
+        }
+        tooltip.classList.remove('show');
+      }
+
+      let lastMouseX = 0;
+      let lastMouseY = 0;
+
+      document.querySelectorAll('[data-tooltip]').forEach((el) => {
+        el.addEventListener('mouseenter', (e) => {
+          const text = el.getAttribute('data-tooltip');
+          if (!text) {
+            return;
+          }
+          lastMouseX = e.clientX;
+          lastMouseY = e.clientY;
+          tooltipTimer = setTimeout(() => {
+            tooltip.textContent = text;
+            tooltip.classList.add('show');
+            positionTooltip(lastMouseX, lastMouseY);
+          }, 1000);
+        });
+        el.addEventListener('mousemove', (e) => {
+          lastMouseX = e.clientX;
+          lastMouseY = e.clientY;
+          if (tooltip.classList.contains('show')) {
+            positionTooltip(e.clientX, e.clientY);
+          }
+        });
+        el.addEventListener('mouseleave', hideTooltip);
+        el.addEventListener('click', hideTooltip);
       });
     </script>
   </body>
