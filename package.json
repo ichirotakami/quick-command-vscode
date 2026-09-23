@@ -49,6 +49,20 @@
           "fontPath": "./media/fonts/quick-command-icons.woff",
           "fontCharacter": "\\E903"
         }
+      },
+      "quick-command-git": {
+        "description": "Git logo",
+        "default": {
+          "fontPath": "./media/fonts/quick-command-icons.woff",
+          "fontCharacter": "\\E905"
+        }
+      },
+      "quick-command-clover": {
+        "description": "Club/clover playing card suit",
+        "default": {
+          "fontPath": "./media/fonts/quick-command-icons.woff",
+          "fontCharacter": "\\E904"
+        }
       }
     },
     "viewsContainers": {
@@ -66,7 +80,7 @@
           "icon": "$(quick-command-knight)",
           "type": "webview",
           "id": "quickCommand.buttonsView",
-          "name": ""
+          "name": "Buttons"
         }
       ]
     },
@@ -156,19 +170,6 @@
                 "default": false,
                 "description": "Auto-press Enter after sending. Default: false (type only, no execute)"
               },
-              "showIn": {
-                "type": "array",
-                "items": {
-                  "type": "string",
-                  "enum": [
-                    "all",
-                    "sidebar",
-                    "statusbar"
-                  ]
-                },
-                "default": [],
-                "description": "Where to show this button. Options: \"all\", \"sidebar\", \"statusbar\". Default: [] (show everywhere)"
-              },
               "group": {
                 "type": "array",
                 "description": "Sub-command group",
@@ -194,19 +195,6 @@
                     "execute": {
                       "type": "boolean",
                       "default": false
-                    },
-                    "showIn": {
-                      "type": "array",
-                      "items": {
-                        "type": "string",
-                        "enum": [
-                          "all",
-                          "sidebar",
-                          "statusbar"
-                        ]
-                      },
-                      "default": [],
-                      "description": "Where to show this sub-command. Options: \"all\", \"sidebar\", \"statusbar\". Default: [] (show everywhere)"
                     }
                   }
                 }
@@ -249,19 +237,6 @@
                 "default": false,
                 "description": "Auto-press Enter after sending. Default: false (type only, no execute)"
               },
-              "showIn": {
-                "type": "array",
-                "items": {
-                  "type": "string",
-                  "enum": [
-                    "all",
-                    "sidebar",
-                    "statusbar"
-                  ]
-                },
-                "default": [],
-                "description": "Where to show this button. Options: \"all\", \"sidebar\", \"statusbar\". Default: [] (show everywhere)"
-              },
               "group": {
                 "type": "array",
                 "description": "Sub-command group",
@@ -287,19 +262,6 @@
                     "execute": {
                       "type": "boolean",
                       "default": false
-                    },
-                    "showIn": {
-                      "type": "array",
-                      "items": {
-                        "type": "string",
-                        "enum": [
-                          "all",
-                          "sidebar",
-                          "statusbar"
-                        ]
-                      },
-                      "default": [],
-                      "description": "Where to show this sub-command. Options: \"all\", \"sidebar\", \"statusbar\". Default: [] (show everywhere)"
                     }
                   }
                 }
@@ -359,6 +321,7 @@
     "icons:build": "python3 scripts/build-icons.py"
   },
   "devDependencies": {
+    "@types/node": "^22.20.3",
     "@types/vscode": "^1.85.0",
     "esbuild": "^0.20.0",
     "typescript": "^5.3.0"

@@ -3,13 +3,10 @@ import * as fs from 'fs';
 import * as path from 'path';
 import iconManifest from './icons/manifest.json';
 
-type ShowInTarget = 'all' | 'sidebar' | 'statusbar';
-
 interface SubCommand {
   label: string;
   command: string | string[];
   execute?: boolean;
-  showIn?: ShowInTarget[];
 }
 
 interface ButtonConfig {
@@ -17,7 +14,6 @@ interface ButtonConfig {
   icon?: string;
   command?: string | string[];
   execute?: boolean;
-  showIn?: ShowInTarget[];
   group?: SubCommand[];
 }
 
@@ -41,33 +37,6 @@ function renderIcon(name: string): string {
     return `<svg class="custom-icon" viewBox="0 0 24 24" fill="currentColor" overflow="visible" xmlns="http://www.w3.org/2000/svg">${custom.svgPath}</svg>`;
   }
   return `<span class="codicon codicon-${escHtml(name)}"></span>`;
-}
-
-// Status bar text only understands codicon `$(name)` syntax; map our custom
-// icons to the theme icon id contributed via `contributes.icons`.
-function statusBarIconStr(icon: string | undefined): string {
-  if (!icon) {
-    return '';
-  }
-  const custom = CUSTOM_ICONS[icon];
-  return `$(${custom ? custom.themeIconId : icon}) `;
-}
-
-function getExecColor(): string {
-  const kind = vscode.window.activeColorTheme.kind;
-  // Light / HighContrastLight
-  if (kind === vscode.ColorThemeKind.Light || kind === vscode.ColorThemeKind.HighContrastLight) {
-    return '#d8fff3';
-  }
-  // Dark / HighContrast
-  return '#4ec9b0';
-}
-
-function shouldShowIn(target: ShowInTarget, item: { showIn?: ShowInTarget[] }): boolean {
-  if (item.showIn === undefined) {
-    return true;
-  }
-  return item.showIn.includes('all') || item.showIn.includes(target);
 }
 
 // ─── WebviewView Provider ────────────────────────────────────
@@ -115,11 +84,7 @@ class QuickCommandViewProvider implements vscode.WebviewViewProvider {
 
     buttons.forEach((btn) => {
       if (btn.group) {
-        if (!shouldShowIn('sidebar', btn)) {
-          return;
-        }
         const subItems = btn.group
-          .filter((sub) => shouldShowIn('sidebar', sub))
           .map((sub) => {
             const cmdJson = JSON.stringify(sub.command);
             const tipStr = Array.isArray(sub.command) ? sub.command.join(' && ') : sub.command;
@@ -139,11 +104,8 @@ class QuickCommandViewProvider implements vscode.WebviewViewProvider {
             </div>`);
         }
       } else {
-        if (!shouldShowIn('sidebar', btn)) {
-          return;
-        }
         const cmdJson = JSON.stringify(btn.command || '');
-        const tipStr = Array.isArray(btn.command) ? (btn.command as string[]).join(' && ') : btn.command || '';
+        const tipStr = Array.isArray(btn.command) ? btn.command.join(' && ') : btn.command || '';
         const execFlag = btn.execute ? 'true' : 'false';
         singleBtns.push(`
           <button class="btn ${btn.execute ? 'btn-exec' : ''}" data-cmd='${escAttr(cmdJson)}' data-execute="${execFlag}" data-tooltip="${escHtml(tipStr)}">
@@ -196,8 +158,6 @@ function escAttr(str: string): string {
 
 // ─── Main ────────────────────────────────────────────────────
 
-let statusBarItems: vscode.StatusBarItem[] = [];
-let dynamicDisposables: vscode.Disposable[] = [];
 let viewProvider: QuickCommandViewProvider;
 
 export function activate(context: vscode.ExtensionContext) {
@@ -241,13 +201,13 @@ export function activate(context: vscode.ExtensionContext) {
       switch (picked.action) {
         case 'open-user':
           await openSettingsJson('user');
-          break;
+          return;
         case 'open-workspace':
           await openSettingsJson('workspace');
-          break;
+          return;
         case 'open-icons':
           await vscode.commands.executeCommand('quickCommand.openIconListing');
-          break;
+          return;
       }
     }),
   );
@@ -286,75 +246,7 @@ async function openSettingsJson(target: 'user' | 'workspace') {
 }
 
 function rebuildAll() {
-  // Dispose old resources (managed separately, not in context.subscriptions)
-  statusBarItems.forEach((item) => item.dispose());
-  statusBarItems = [];
-  dynamicDisposables.forEach((d) => d.dispose());
-  dynamicDisposables = [];
-
-  const { userButtons, workspaceButtons } = getAllButtons();
-  const allButtons = [...userButtons, ...workspaceButtons];
-
-  const MAX_STATUSBAR_ITEMS = 10;
-  let topCount = 0;
-  let cmdIndex = 0;
-
-  allButtons.forEach((btn) => {
-    if (topCount >= MAX_STATUSBAR_ITEMS) {
-      return;
-    }
-    if (!shouldShowIn('statusbar', btn)) {
-      return;
-    }
-
-    if (btn.group) {
-      const commandId = `quickCommand.run.${cmdIndex}`;
-      const cmdDisp = vscode.commands.registerCommand(commandId, () => showGroupPick(btn.group!));
-      dynamicDisposables.push(cmdDisp);
-
-      const item = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 10000 - cmdIndex);
-      const iconStr = statusBarIconStr(btn.icon);
-      item.text = `${iconStr}${btn.label} $(chevron-down)`;
-      item.command = commandId;
-      const lines = btn.group.map((sub) => {
-        const cmdStr = Array.isArray(sub.command) ? sub.command.join(' && ') : sub.command;
-        return `- \`${sub.label}: ${cmdStr}\``;
-      });
-      item.tooltip = new vscode.MarkdownString(lines.join('\n'), true);
-      item.show();
-      statusBarItems.push(item);
-      topCount++;
-      cmdIndex++;
-    } else {
-      const commandId = `quickCommand.run.${cmdIndex}`;
-      const cmdDisp = vscode.commands.registerCommand(commandId, () => executeButton(btn));
-      dynamicDisposables.push(cmdDisp);
-
-      const item = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 10000 - cmdIndex);
-      const iconStr = statusBarIconStr(btn.icon);
-      item.text = `${iconStr}${btn.label}`;
-      if (btn.execute) {
-        item.color = getExecColor();
-      }
-      item.command = commandId;
-      const cmdStr = Array.isArray(btn.command) ? btn.command.join(' && ') : btn.command || '';
-      item.tooltip = cmdStr;
-      item.show();
-      statusBarItems.push(item);
-      topCount++;
-      cmdIndex++;
-    }
-  });
-
   viewProvider?.refresh();
-}
-
-function executeButton(btn: ButtonConfig) {
-  if (btn.command) {
-    sendToTerminal(btn.command, btn.execute ?? false);
-  } else if (btn.group) {
-    showGroupPick(btn.group);
-  }
 }
 
 function sendToTerminal(command: string | string[], execute = false) {
@@ -370,19 +262,5 @@ function sendToTerminal(command: string | string[], execute = false) {
   });
 }
 
-async function showGroupPick(group: SubCommand[]) {
-  const items = group.map((g) => ({
-    label: g.label,
-    description: Array.isArray(g.command) ? g.command.join(' && ') : g.command,
-    _sub: g,
-  }));
-  const picked = await vscode.window.showQuickPick(items, { placeHolder: 'Select a command to run' });
-  if (picked) {
-    sendToTerminal(picked._sub.command, picked._sub.execute ?? false);
-  }
-}
-
 export function deactivate() {
-  statusBarItems.forEach((item) => item.dispose());
-  dynamicDisposables.forEach((d) => d.dispose());
 }

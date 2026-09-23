@@ -41,7 +41,7 @@ SCALE = UNITS_PER_EM / VIEWBOX
 
 def build_glyph(path_data: str):
     ttpen = TTGlyphPen(None)
-    cu2qu = Cu2QuPen(ttpen, max_err=1.0)
+    cu2qu = Cu2QuPen(ttpen, max_err=0.1)
     # Flip Y (SVG y-down -> font y-up) and scale the 24-unit viewBox to unitsPerEm.
     transform = (SCALE, 0, 0, -SCALE, 0, VIEWBOX * SCALE)
     parse_path(path_data, TransformPen(cu2qu, transform))

@@ -2,8 +2,6 @@
 
 A VS Code extension that provides quick command buttons for the terminal. Define your frequently used commands, then execute them with a single click.
 
-[中文文档](README_CN.md)
-
 ![Quick Command screenshot](https://raw.githubusercontent.com/kookob/quick-command-vscode/main/images/screenshot.png)
 
 ## Features
@@ -17,10 +15,6 @@ A dedicated sidebar panel in the Activity Bar displays all your configured comma
 
 Group commands are displayed with a section title and inline sub-command buttons. Single commands appear as individual buttons in a flex row.
 
-### Status Bar Buttons
-
-Any button can optionally be pinned to the bottom status bar by setting `"showIn": ["statusbar"]`. Group buttons appear as dropdowns, and individual sub-commands can also be pinned separately.
-
 ### Key Features
 
 - **Single Command** — Send a command to the active terminal with one click
@@ -29,7 +23,7 @@ Any button can optionally be pinned to the bottom status bar by setting `"showIn
 - **Execute Control** — Choose whether commands auto-execute (press Enter) or just type into the terminal for review
 - **Two-level Config** — Global commands (user settings) + Workspace commands (project settings), merged and displayed together
 - **Codicon Icons** — Full support for VS Code's built-in [codicon](https://code.visualstudio.com/api/references/icons-in-labels#icon-listing) icon library
-- **Visual Indicators** — Green dot on auto-execute buttons, click feedback animation
+- **Visual Indicators** — Green text/icon on auto-execute buttons, click feedback animation
 - **Tooltip Preview** — Hover over any button to see the actual command(s) it will send
 
 ## Configuration
@@ -46,13 +40,12 @@ Quick Command uses two configuration keys:
 | Property | Type | Default | Description |
 |----------|------|---------|-------------|
 | `label` | `string` | — | Button display text (required) |
-| `icon` | `string` | `"terminal"` | [Codicon](https://code.visualstudio.com/api/references/icons-in-labels#icon-listing) icon name, or a brand icon (`"dbt"`, `"docker"`, `"pre-commit"`) |
+| `icon` | `string` | `"terminal"` | [Codicon](https://code.visualstudio.com/api/references/icons-in-labels#icon-listing) icon name, or one of this extension's built-in brand icons (see `src/icons/manifest.json`) |
 | `command` | `string \| string[]` | — | Command(s) to send to terminal |
 | `execute` | `boolean` | `false` | Auto-press Enter after sending |
-| `showIn` | `("all" \| "sidebar" \| "statusbar")[]` | `[]` | Control whether the button appears in the sidebar, status bar, or both |
 | `group` | `SubCommand[]` | — | Sub-commands (makes this a group button) |
 
-Sub-commands support `label`, `command`, `execute`, and `showIn`.
+Sub-commands support `label`, `command`, and `execute`.
 
 ### Examples
 
@@ -65,8 +58,7 @@ Sub-commands support `label`, `command`, `execute`, and `showIn`.
       "label": "Dev",
       "icon": "play",
       "command": "npm run dev",
-      "execute": true,
-      "showIn": ["sidebar", "statusbar"]
+      "execute": true
     },
     {
       "label": "Build",
@@ -129,9 +121,9 @@ When `execute` is `true`, all lines are sent with Enter. When `false`, the last 
 - `"execute": false` (default) — Command is typed into the terminal but not executed. You press Enter manually.
 - `"execute": true` — Command is sent and executed immediately.
 
-Buttons with `execute: true` show a green dot indicator in the sidebar panel.
+Buttons with `execute: true` show in green in the sidebar panel.
 
-Use the `Settings` action to open a menu that can jump to global or project settings, copy a ready-to-paste single-button or group-button example, or open the Codicon catalog in your browser.
+Use the `Settings` action to open a menu that can jump to global or project settings, or open the Codicon catalog in your browser.
 
 ## Panel Actions
 
