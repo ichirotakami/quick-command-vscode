@@ -283,6 +283,11 @@
         "icon": "$(refresh)"
       },
       {
+        "command": "quickCommand.newTerminal",
+        "title": "Quick Command: New Terminal",
+        "icon": "$(add)"
+      },
+      {
         "command": "quickCommand.openSettings",
         "title": "Quick Command: Edit Settings",
         "icon": "$(gear)"
@@ -301,9 +306,14 @@
           "group": "navigation@0"
         },
         {
-          "command": "quickCommand.openSettings",
+          "command": "quickCommand.newTerminal",
           "when": "view == quickCommand.buttonsView",
           "group": "navigation@1"
+        },
+        {
+          "command": "quickCommand.openSettings",
+          "when": "view == quickCommand.buttonsView",
+          "group": "navigation@2"
         }
       ],
       "editor/title": [

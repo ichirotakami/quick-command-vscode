@@ -175,6 +175,9 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand('quickCommand.refreshButtons', () => {
       rebuildAll();
     }),
+    vscode.commands.registerCommand('quickCommand.newTerminal', () => {
+      vscode.window.createTerminal().show();
+    }),
     vscode.commands.registerCommand('quickCommand.openPanel', () => {
       vscode.commands.executeCommand('workbench.view.extension.quickCommandPanel');
     }),
