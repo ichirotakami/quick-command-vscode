@@ -15,6 +15,7 @@ interface ButtonConfig {
   command?: string | string[];
   execute?: boolean;
   group?: SubCommand[];
+  section?: string;
 }
 
 // Brand icons that codicons doesn't cover. Defined once in src/icons/manifest.json
@@ -73,16 +74,24 @@ class QuickCommandViewProvider implements vscode.WebviewViewProvider {
   }
 
   private _renderButtons(buttons: ButtonConfig[]): string {
-    const sections: string[] = [];
+    const blocks: string[] = [];
     let singleBtns: string[] = [];
+    // Consecutive buttons sharing the same `section` get clustered under one
+    // header; a new header starts whenever the section value changes (including
+    // dropping back to no section), so array order is always what you see.
+    let currentSection: string | undefined;
     const flushSingles = () => {
       if (singleBtns.length > 0) {
-        sections.push(`<div class="section"><div class="btn-row">${singleBtns.join('')}</div></div>`);
+        blocks.push(`<div class="section"><div class="btn-row">${singleBtns.join('')}</div></div>`);
         singleBtns = [];
       }
     };
 
     buttons.forEach((btn) => {
+      if (btn.section !== currentSection) {
+        flushSingles();
+        currentSection = btn.section;
+      }
       if (btn.group) {
         const subItems = btn.group
           .map((sub) => {
@@ -115,7 +124,7 @@ class QuickCommandViewProvider implements vscode.WebviewViewProvider {
       }
     });
     flushSingles();
-    return sections.join('<div class="divider"></div>');
+    return blocks.join('');
   }
 
   private _getHtml(): string {

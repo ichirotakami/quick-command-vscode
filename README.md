@@ -2,7 +2,7 @@
 
 A VS Code extension that provides quick command buttons for the terminal. Define your frequently used commands, then execute them with a single click.
 
-![Quick Command screenshot](https://raw.githubusercontent.com/kookob/quick-command-vscode/main/images/screenshot.png)
+![Quick Command screenshot](images/screenshot.png)
 
 ## Features
 
@@ -13,7 +13,7 @@ A dedicated sidebar panel in the Activity Bar displays all your configured comma
 - **Global** — User-level commands shared across all projects
 - **Workspace** — Project-specific commands for the current workspace
 
-Group commands are displayed with a section title and inline sub-command buttons. Single commands appear as individual buttons in a flex row.
+Group commands are displayed as a dropdown with inline sub-command buttons. Single commands appear as individual buttons in a flex row, optionally clustered into visual sections.
 
 ### Key Features
 
@@ -43,6 +43,7 @@ Quick Command uses two configuration keys:
 | `icon` | `string` | `"terminal"` | [Codicon](https://code.visualstudio.com/api/references/icons-in-labels#icon-listing) icon name, or one of this extension's built-in brand icons (see `src/icons/manifest.json`) |
 | `command` | `string \| string[]` | — | Command(s) to send to terminal |
 | `execute` | `boolean` | `false` | Auto-press Enter after sending |
+| `section` | `string` | — | Visually clusters consecutive buttons sharing the same value (no label shown) |
 | `group` | `SubCommand[]` | — | Sub-commands (makes this a group button) |
 
 Sub-commands support `label`, `command`, and `execute`.
@@ -127,9 +128,10 @@ Use the `Settings` action to open a menu that can jump to global or project sett
 
 ## Panel Actions
 
-The sidebar panel title bar has two action buttons:
+The sidebar panel title bar has three action buttons:
 
 - **Refresh** — Reload buttons from configuration
+- **New Terminal** — Open a new terminal
 - **Settings** — Open Quick Command settings
 
 ## Common Codicon Icons

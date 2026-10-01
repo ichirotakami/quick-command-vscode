@@ -63,6 +63,13 @@
           "fontPath": "./media/fonts/quick-command-icons.woff",
           "fontCharacter": "\\E904"
         }
+      },
+      "quick-command-jira": {
+        "description": "Jira logo",
+        "default": {
+          "fontPath": "./media/fonts/quick-command-icons.woff",
+          "fontCharacter": "\\E906"
+        }
       }
     },
     "viewsContainers": {
@@ -170,6 +177,10 @@
                 "default": false,
                 "description": "Auto-press Enter after sending. Default: false (type only, no execute)"
               },
+              "section": {
+                "type": "string",
+                "description": "Visually clusters consecutive buttons sharing the same section value (no label shown). Buttons without it render ungrouped."
+              },
               "group": {
                 "type": "array",
                 "description": "Sub-command group",
@@ -236,6 +247,10 @@
                 "type": "boolean",
                 "default": false,
                 "description": "Auto-press Enter after sending. Default: false (type only, no execute)"
+              },
+              "section": {
+                "type": "string",
+                "description": "Visually clusters consecutive buttons sharing the same section value (no label shown). Buttons without it render ungrouped."
               },
               "group": {
                 "type": "array",
