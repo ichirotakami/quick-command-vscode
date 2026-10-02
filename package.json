@@ -310,8 +310,15 @@
         "icon": "$(add)"
       },
       {
+        "command": "quickCommand.newTerminalInEditor",
+        "title": "New Terminal in Editor Area",
+        "category": "Quick Command",
+        "icon": "$(editor-layout)"
+      },
+      {
         "command": "quickCommand.openSettings",
-        "title": "Quick Command: Edit Settings",
+        "title": "Edit Settings",
+        "category": "Quick Command",
         "icon": "$(gear)"
       },
       {
@@ -333,9 +340,14 @@
           "group": "navigation@1"
         },
         {
+          "command": "quickCommand.newTerminalInEditor",
+          "when": "view == quickCommand.buttonsView",
+          "group": "1_terminal@1"
+        },
+        {
           "command": "quickCommand.openSettings",
           "when": "view == quickCommand.buttonsView",
-          "group": "navigation@2"
+          "group": "2_settings@1"
         }
       ],
       "editor/title": [

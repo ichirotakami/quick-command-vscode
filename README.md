@@ -124,15 +124,19 @@ When `execute` is `true`, all lines are sent with Enter. When `false`, the last 
 
 Buttons with `execute: true` show in green in the sidebar panel.
 
-Use the `Settings` action to open a menu that can jump to global or project settings, or open the Codicon catalog in your browser.
+Use **Edit Settings** in the panel's `...` menu to jump to global or project settings, or open the Codicon catalog in your browser.
 
 ## Panel Actions
 
-The sidebar panel title bar has three action buttons:
+The sidebar panel title bar has two action buttons:
 
 - **Refresh** — Reload buttons from configuration
-- **New Terminal** — Open a new terminal
-- **Settings** — Open Quick Command settings
+- **New Terminal** — Open a new terminal in the panel
+
+The `...` (More Actions) menu has:
+
+- **New Terminal in Editor Area** — Open a new terminal as an editor tab
+- **Edit Settings** — Open Quick Command settings
 
 ## Common Codicon Icons
 

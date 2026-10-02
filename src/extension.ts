@@ -146,7 +146,7 @@ class QuickCommandViewProvider implements vscode.WebviewViewProvider {
     }
     if (parts.length === 0) {
       parts.push(
-        '<div class="empty">No commands configured. Click <span class="codicon codicon-gear"></span> to edit settings or copy an example.</div>',
+        '<div class="empty">No commands configured. Open the <span class="codicon codicon-ellipsis"></span> menu and choose Edit Settings.</div>',
       );
     }
     const body = parts.join('<div class="divider thick"></div>');
@@ -187,8 +187,13 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand('quickCommand.newTerminal', () => {
       vscode.window.createTerminal().show();
     }),
+    vscode.commands.registerCommand('quickCommand.newTerminalInEditor', () => {
+      vscode.window.createTerminal({ location: vscode.TerminalLocation.Editor }).show();
+    }),
     vscode.commands.registerCommand('quickCommand.openPanel', () => {
-      vscode.commands.executeCommand('workbench.view.extension.quickCommandPanel');
+      // Focus the view itself rather than its original container, so this still
+      // works after the user drags the view into the panel or secondary sidebar.
+      vscode.commands.executeCommand(`${QuickCommandViewProvider.viewType}.focus`);
     }),
     vscode.commands.registerCommand('quickCommand.openSettings', async () => {
       const items = [

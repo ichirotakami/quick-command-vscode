@@ -47,8 +47,10 @@ Button schema:
 - `showIn`: controls sidebar / statusbar visibility; omitted means show everywhere
 
 ### 4. Panel Title Bar Actions
-- Refresh button (navigation@1) — rebuilds all buttons from config
-- Settings gear (navigation@2) — opens `quickCommand` settings
+- Refresh button (navigation@0) — rebuilds all buttons from config
+- New Terminal `+` (navigation@1) — opens a terminal in the panel
+- `...` overflow menu: New Terminal in Editor Area (`1_terminal`), then Edit Settings (`2_settings`) — opens the global/project settings picker
+- `quickCommand.openPanel` focuses `quickCommand.buttonsView.focus` (not the view container), so it works after the view is dragged elsewhere
 
 ## Technical Notes
 
