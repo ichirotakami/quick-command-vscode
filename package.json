@@ -70,6 +70,13 @@
           "fontPath": "./media/fonts/quick-command-icons.woff",
           "fontCharacter": "\\E906"
         }
+      },
+      "quick-command-airflow": {
+        "description": "Apache Airflow pinwheel logo",
+        "default": {
+          "fontPath": "./media/fonts/quick-command-icons.woff",
+          "fontCharacter": "\\E907"
+        }
       }
     },
     "viewsContainers": {
