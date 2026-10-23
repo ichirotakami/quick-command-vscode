@@ -77,6 +77,13 @@
           "fontPath": "./media/fonts/quick-command-icons.woff",
           "fontCharacter": "\\E907"
         }
+      },
+      "quick-command-uv": {
+        "description": "uv (Astral) logo",
+        "default": {
+          "fontPath": "./media/fonts/quick-command-icons.woff",
+          "fontCharacter": "\\E908"
+        }
       }
     },
     "viewsContainers": {
